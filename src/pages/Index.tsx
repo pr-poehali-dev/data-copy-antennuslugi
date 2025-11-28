@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import Icon from '@/components/ui/icon';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ProductCard from '@/components/ProductCard';
 
 interface Product {
   id: number;
@@ -163,33 +164,7 @@ const Index = () => {
           <h2 className="text-4xl font-bold text-center mb-12">Популярные товары</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.slice(0, 3).map((product) => (
-              <Card key={product.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in">
-                <div className="aspect-square overflow-hidden bg-white">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                <CardContent className="p-6">
-                  <Badge className="mb-3">{product.category}</Badge>
-                  <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{product.description}</p>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      {product.oldPrice && (
-                        <span className="text-sm text-muted-foreground line-through mr-2">
-                          {product.oldPrice} ₽
-                        </span>
-                      )}
-                      <span className="text-2xl font-bold text-primary">{product.price} ₽</span>
-                    </div>
-                    <Button onClick={() => addToCart(product)} className="bg-secondary hover:bg-secondary/90">
-                      <Icon name="ShoppingCart" size={18} />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
             ))}
           </div>
           <div className="text-center mt-10">
@@ -249,33 +224,7 @@ const Index = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="aspect-square overflow-hidden bg-white">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                />
-              </div>
-              <CardContent className="p-6">
-                <Badge className="mb-3">{product.category}</Badge>
-                <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                <p className="text-muted-foreground text-sm mb-4">{product.description}</p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    {product.oldPrice && (
-                      <span className="text-sm text-muted-foreground line-through mr-2">
-                        {product.oldPrice} ₽
-                      </span>
-                    )}
-                    <span className="text-2xl font-bold text-primary">{product.price} ₽</span>
-                  </div>
-                  <Button onClick={() => addToCart(product)} className="bg-secondary hover:bg-secondary/90">
-                    <Icon name="ShoppingCart" size={18} />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
           ))}
         </div>
       </div>
@@ -439,118 +388,15 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div 
-              className="flex items-center gap-2 cursor-pointer"
-              onClick={() => setCurrentPage('home')}
-            >
-              <Icon name="Satellite" size={32} className="text-primary" />
-              <span className="text-2xl font-bold">АнтеннУслуги</span>
-            </div>
-
-            <nav className="hidden md:flex items-center gap-6">
-              {[
-                { page: 'home', label: 'Главная' },
-                { page: 'catalog', label: 'Каталог' },
-                { page: 'about', label: 'О компании' },
-                { page: 'services', label: 'Услуги' },
-                { page: 'delivery', label: 'Доставка' },
-                { page: 'contacts', label: 'Контакты' }
-              ].map(item => (
-                <button
-                  key={item.page}
-                  onClick={() => setCurrentPage(item.page as any)}
-                  className={`text-base font-medium transition-colors hover:text-primary ${
-                    currentPage === item.page ? 'text-primary' : 'text-foreground'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="relative">
-                  <Icon name="ShoppingCart" size={20} />
-                  {totalItems > 0 && (
-                    <Badge className="absolute -top-2 -right-2 bg-secondary">{totalItems}</Badge>
-                  )}
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="w-full sm:max-w-lg">
-                <SheetHeader>
-                  <SheetTitle className="text-2xl">Корзина</SheetTitle>
-                </SheetHeader>
-                <div className="mt-8 space-y-4">
-                  {cart.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Icon name="ShoppingCart" size={48} className="mx-auto text-muted-foreground mb-4" />
-                      <p className="text-lg text-muted-foreground">Корзина пуста</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-                        {cart.map(item => (
-                          <Card key={item.id} className="p-4">
-                            <div className="flex gap-4">
-                              <img 
-                                src={item.image} 
-                                alt={item.name}
-                                className="w-20 h-20 object-cover rounded"
-                              />
-                              <div className="flex-1">
-                                <h3 className="font-semibold mb-1">{item.name}</h3>
-                                <p className="text-sm text-muted-foreground mb-2">{item.price} ₽</p>
-                                <div className="flex items-center gap-2">
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    onClick={() => updateQuantity(item.id, -1)}
-                                  >
-                                    <Icon name="Minus" size={14} />
-                                  </Button>
-                                  <span className="w-8 text-center font-medium">{item.quantity}</span>
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    onClick={() => updateQuantity(item.id, 1)}
-                                  >
-                                    <Icon name="Plus" size={14} />
-                                  </Button>
-                                  <Button 
-                                    size="sm" 
-                                    variant="ghost"
-                                    onClick={() => removeFromCart(item.id)}
-                                    className="ml-auto text-destructive"
-                                  >
-                                    <Icon name="Trash2" size={16} />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-                      <div className="border-t pt-4 space-y-4">
-                        <div className="flex justify-between text-xl font-bold">
-                          <span>Итого:</span>
-                          <span className="text-primary">{totalPrice} ₽</span>
-                        </div>
-                        <Button className="w-full bg-secondary hover:bg-secondary/90" size="lg">
-                          Оформить заказ
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </header>
+      <Header
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+        cart={cart}
+        totalItems={totalItems}
+        onUpdateQuantity={updateQuantity}
+        onRemoveFromCart={removeFromCart}
+        totalPrice={totalPrice}
+      />
 
       <main>
         {currentPage === 'home' && renderHome()}
@@ -561,37 +407,7 @@ const Index = () => {
         {currentPage === 'contacts' && renderContacts()}
       </main>
 
-      <footer className="bg-foreground text-white py-12 px-6 mt-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Icon name="Satellite" size={28} />
-                <span className="text-xl font-bold">АнтеннУслуги</span>
-              </div>
-              <p className="text-white/80">Профессиональное оборудование и услуги для связи</p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Контакты</h3>
-              <div className="space-y-2 text-white/80">
-                <p>+7 (495) 123-45-67</p>
-                <p>info@antennuslugi.ru</p>
-                <p>г. Москва, ул. Примерная, д. 1</p>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Режим работы</h3>
-              <div className="space-y-2 text-white/80">
-                <p>Пн-Пт: 9:00 - 18:00</p>
-                <p>Сб-Вс: выходной</p>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/60">
-            © 2024 АнтеннУслуги. Все права защищены.
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

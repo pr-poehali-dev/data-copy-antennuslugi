@@ -355,7 +355,7 @@ const Index = () => {
               <Icon name="MapPin" size={24} className="text-primary" />
               Адрес
             </h2>
-            <p className="text-lg">г. Москва, ул. Примерная, д. 1</p>
+            <p className="text-lg">Московская область, Химкинский район, д. Брехово, ТЦ СТРОЙДВОР БРЕХОВО, павильон А32</p>
           </Card>
 
           <Card className="p-6">
